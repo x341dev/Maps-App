@@ -46,7 +46,7 @@ kotlin {
 }
 
 secrets {
-    propertiesFileName = "secret.properties"
+    propertiesFileName = "secrets.properties"
     defaultPropertiesFileName = "local.properties"
 }
 
