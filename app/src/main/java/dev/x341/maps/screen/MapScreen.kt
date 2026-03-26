@@ -48,11 +48,13 @@ fun MapScreen(
                 tempMarkPos = latLnt
             }
         ) {
-            Marker(
+            MarkerInfoWindow(
                 state = rememberUpdatedMarkerState(position = itb),
-                title = "ITB",
-                snippet = "Marker at ITB"
-            )
+            ) {
+                MarkerCard(
+                    markerData = viewModel.getItbMarker()
+                )
+            }
 
             markerList.forEach { marker ->
                 val pos = LatLng(marker.latitude, marker.longitude)

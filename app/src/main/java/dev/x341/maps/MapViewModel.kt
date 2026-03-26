@@ -35,4 +35,15 @@ class MapViewModel : ViewModel() {
             }
         }
     }
+
+    fun getItbMarker(): UserMarker {
+        return UserMarker(
+            id = "itb",
+            user_id = "system",
+            latitude = 41.45357483065934,
+            longitude = 2.1861210702710827,
+            title = "ITB",
+            snippet = "Institut Tecnològic de Barcelona",
+        )
+    }
 }
