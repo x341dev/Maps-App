@@ -1,29 +1,23 @@
 package dev.x341.maps.screen
 
-import android.net.Uri
+import android.graphics.Bitmap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.LatLng
 import dev.x341.maps.MapViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddMarkerScreen(
     latLng: LatLng,
@@ -32,66 +26,76 @@ fun AddMarkerScreen(
 ) {
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
 
-    val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        imageUri = uri
+    var capturedBitmap by remember { mutableStateOf<Bitmap?>(null) }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap: Bitmap? ->
+        capturedBitmap = bitmap
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Text(text = "New marker", style = MaterialTheme.typography.headlineMedium)
-        Text(text = "Coordinates: ${latLng.latitude}, ${latLng.longitude}" )
-
-        OutlinedTextField(
-            value = title,
-            onValueChange = { title = it },
-            label = { Text("Title") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        OutlinedTextField(
-            value = description,
-            onValueChange = { description = it },
-            label = { Text("Description") },
-            modifier = Modifier.fillMaxWidth(),
-            minLines = 4
-        )
-
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(onClick = { galleryLauncher.launch("image/*") }) {
-                Text("Galeria")
-            }
-            Button(onClick = { /* TODO: Lógica de cámara */ }) {
-                Text("Càmera")
-            }
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text("Nou Marcador") })
         }
-
-        imageUri?.let {
-            Text("Imatge seleccionada!", color = MaterialTheme.colorScheme.primary)
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = {
-                viewModel.addMarker(
-                    lat = latLng.latitude,
-                    lng = latLng.longitude,
-                    title = title,
-                    snippet = description
-                )
-                onNavigateBack()
-            }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Desar Marcador")
+            Text(text = "Coordenades: ${"%.4f".format(latLng.latitude)}, ${"%.4f".format(latLng.longitude)}")
+
+            OutlinedTextField(
+                value = title,
+                onValueChange = { title = it },
+                label = { Text("Títol") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+                value = description,
+                onValueChange = { description = it },
+                label = { Text("Descripció") },
+                modifier = Modifier.fillMaxWidth(),
+                minLines = 3
+            )
+
+            capturedBitmap?.let { bitmap ->
+                Image(
+                    bitmap = bitmap.asImageBitmap(),
+                    contentDescription = "Foto capturada",
+                    modifier = Modifier
+                        .size(150.dp)
+                        .clip(RoundedCornerShape(12.dp)),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+            Button(
+                onClick = { cameraLauncher.launch(null) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(if (capturedBitmap == null) "Fer Foto" else "Canviar Foto")
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
+                    // TODO: Aquí tendrías que llamar a una función del ViewModel
+                    // que suba el 'capturedBitmap' a Supabase Storage primero.
+                    // Y luego guarde el marcador.
+                    onNavigateBack()
+                }
+            ) {
+                Text("Desar Marcador")
+            }
         }
     }
 }
