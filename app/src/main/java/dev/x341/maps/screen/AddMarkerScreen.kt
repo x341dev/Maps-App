@@ -2,9 +2,7 @@ package dev.x341.maps.screen
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.animateBounds
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,11 +20,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.LatLng
 import dev.x341.maps.MapViewModel
-import io.ktor.util.valuesOf
 
 @Composable
 fun AddMarkerScreen(
@@ -79,8 +75,6 @@ fun AddMarkerScreen(
 
         imageUri?.let {
             Text("Imatge seleccionada!", color = MaterialTheme.colorScheme.primary)
-            // Aquí podrías usar la librería Coil para mostrar una vista previa de la imagen:
-            // AsyncImage(model = imageUri, contentDescription = null)
         }
 
         Spacer(modifier = Modifier.weight(1f))
@@ -88,13 +82,11 @@ fun AddMarkerScreen(
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
-                // AQUÍ es donde realmente guardamos en base de datos
                 viewModel.addMarker(
                     lat = latLng.latitude,
                     lng = latLng.longitude,
                     title = title,
                     snippet = description
-                    // Faltaría pasar la imagen
                 )
                 onNavigateBack()
             }

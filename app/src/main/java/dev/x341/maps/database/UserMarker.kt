@@ -10,5 +10,6 @@ data class UserMarker(
     val longitude: Double,
     val title: String? = null,
     val snippet: String? = null,
+    val image_url: String? = null,
     val created_at: String? = null
 )
