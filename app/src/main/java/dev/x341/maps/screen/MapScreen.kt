@@ -17,7 +17,10 @@ import com.google.maps.android.compose.rememberUpdatedMarkerState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.maps.android.compose.MarkerInfoWindow
 import dev.x341.maps.MapViewModel
+import dev.x341.maps.component.MarkerCard
+import dev.x341.maps.component.TempMarkerCard
 
 
 @Composable
@@ -53,11 +56,11 @@ fun MapScreen(
 
             markerList.forEach { marker ->
                 val pos = LatLng(marker.latitude, marker.longitude)
-                Marker(
-                    state = rememberUpdatedMarkerState(position = pos),
-                    title = marker.title ?: "Mark",
-                    snippet = marker.snippet
-                )
+                MarkerInfoWindow(
+                    state = rememberUpdatedMarkerState(position = pos)
+                ) {
+                    MarkerCard(markerData = marker)
+                }
             }
 
             tempMarkPos?.let { pos ->
@@ -68,24 +71,16 @@ fun MapScreen(
                     markerState.showInfoWindow()
                 }
 
-                Marker(
+                MarkerInfoWindow(
                     state = markerState,
-                    title = "Add new marker?",
-                    snippet = "Create new marker",
                     visible = true,
-                    onInfoWindowClick = { marker ->
-                        viewModel.addMarker(
-                            lat = marker.position.latitude,
-                            lng = marker.position.longitude,
-                            // TODO: REMAKE TO USE SCREEN
-                            title = "New marker",
-                            snippet = "Saved"
-
-                        )
+                    onInfoWindowClick = {
                         tempMarkPos = null
-                        onNavigate(marker.position)
+                        onNavigate(pos)
                     }
-                )
+                ) {
+                    TempMarkerCard(lat = pos.latitude, lng = pos.longitude)
+                }
             }
         }
     }
