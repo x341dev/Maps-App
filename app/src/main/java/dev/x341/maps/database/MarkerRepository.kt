@@ -147,8 +147,17 @@ class MarkerRepository {
         }
     }
 
-    suspend fun deleteMarker(markerId: String): Boolean {
+    suspend fun deleteMarker(markerId: String, imageUrl: String?): Boolean {
         return try {
+            if (!imageUrl.isNullOrEmpty()) {
+                try {
+                    val fileName = imageUrl.substringAfter("/")
+                    supabase.storage.from(bucketName).delete(fileName)
+                } catch (e: Exception) {
+                    Log.e("SupabaseRepo", "Error deleting image: ${e.message}")
+                }
+            }
+
             supabase.postgrest[tableName].delete {
                 filter {
                     UserMarker::id eq markerId
