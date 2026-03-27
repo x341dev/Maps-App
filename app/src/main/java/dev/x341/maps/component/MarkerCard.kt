@@ -15,14 +15,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import dev.x341.maps.database.UserMarker
 
 @Composable
 fun MarkerCard(markerData: UserMarker) {
+    val context = LocalContext.current
+
     Card(
         modifier = Modifier
             .width(200.dp)
@@ -34,7 +38,11 @@ fun MarkerCard(markerData: UserMarker) {
         Column {
             if (!markerData.image_url.isNullOrEmpty()) {
                 AsyncImage(
-                    model = markerData.image_url,
+                    model = ImageRequest.Builder(context)
+                        .data(markerData.image_url)
+                        .allowHardware(false)
+                        .crossfade(true)
+                        .build(),
                     contentDescription = "Marker Image",
                     modifier = Modifier
                         .fillMaxWidth()
