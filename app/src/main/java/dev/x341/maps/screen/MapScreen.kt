@@ -27,7 +27,8 @@ import dev.x341.maps.component.TempMarkerCard
 fun MapScreen(
     modifier: Modifier = Modifier,
     viewModel: MapViewModel,
-    onNavigate: (LatLng) -> Unit
+    onNavigateToAdd: (LatLng) -> Unit,
+    onNavigateToEdit: (String) -> Unit
 ) {
     val markerList by viewModel.markers.collectAsState()
 
@@ -68,7 +69,12 @@ fun MapScreen(
                     val markerState = rememberUpdatedMarkerState(pos)
 
                     MarkerInfoWindow(
-                        state = markerState
+                        state = markerState,
+                        onInfoWindowClick = {
+                            marker.id?.let { id ->
+                                onNavigateToEdit(id)
+                            }
+                        }
                     ) {
                         MarkerCard(markerData = marker)
                     }
@@ -88,7 +94,7 @@ fun MapScreen(
                     visible = true,
                     onInfoWindowClick = {
                         tempMarkPos = null
-                        onNavigate(pos)
+                        onNavigateToAdd(pos)
                     }
                 ) {
                     TempMarkerCard(lat = pos.latitude, lng = pos.longitude)

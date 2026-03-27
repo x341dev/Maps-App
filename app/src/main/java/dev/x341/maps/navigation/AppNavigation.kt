@@ -22,6 +22,7 @@ import com.google.android.gms.maps.model.LatLng
 import dev.x341.maps.MapViewModel
 import dev.x341.maps.database.SupabaseClient
 import dev.x341.maps.screen.AddMarkerScreen
+import dev.x341.maps.screen.EditMarkerScreen
 import dev.x341.maps.screen.MapScreen
 import io.github.jan.supabase.auth.auth
 
@@ -61,8 +62,12 @@ fun AppNavigation() {
         composable(route = Routes.MapScreen.route) {
             MapScreen(
                 viewModel = sharedViewModel,
-                onNavigate = { latLng ->
+                onNavigateToAdd = { latLng ->
                     val route = Routes.AddMarkerScreen.createRoute(latLng.latitude, latLng.longitude)
+                    navController.navigate(route)
+                },
+                onNavigateToEdit = { markerId ->
+                    val route = Routes.EditMarkerScreen.createRoute(markerId)
                     navController.navigate(route)
                 }
             )
@@ -81,6 +86,21 @@ fun AppNavigation() {
 
             AddMarkerScreen(
                 latLng = latLng,
+                viewModel = sharedViewModel,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = Routes.EditMarkerScreen.route,
+            arguments = listOf(
+                navArgument("markerId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val markerId = backStackEntry.arguments?.getString("markerId") ?: return@composable
+
+            EditMarkerScreen(
+                markerId = markerId,
                 viewModel = sharedViewModel,
                 onNavigateBack = { navController.popBackStack() }
             )
