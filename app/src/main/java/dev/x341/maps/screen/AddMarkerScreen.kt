@@ -55,10 +55,12 @@ fun AddMarkerScreen(
         when (uploadState) {
             is UploadState.Success -> {
                 Toast.makeText(context, "Marcador desat amb èxit!", Toast.LENGTH_SHORT).show()
+                viewModel.resetUploadState()
                 onNavigateBack()
             }
             is UploadState.Error -> {
                 Toast.makeText(context, "Error al desar el marcador: ${(uploadState as UploadState.Error).message}", Toast.LENGTH_LONG).show()
+                viewModel.resetUploadState()
             }
             else -> {} // No action needed for Idle or Loading states here
         }
