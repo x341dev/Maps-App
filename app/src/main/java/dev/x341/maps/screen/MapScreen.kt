@@ -11,13 +11,13 @@ import androidx.compose.ui.Modifier
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.key
 import com.google.maps.android.compose.MarkerInfoWindow
+import com.google.maps.android.compose.rememberMarkerState
 import dev.x341.maps.MapViewModel
 import dev.x341.maps.component.MarkerCard
 import dev.x341.maps.component.TempMarkerCard
@@ -26,7 +26,7 @@ import dev.x341.maps.component.TempMarkerCard
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
-    viewModel: MapViewModel = viewModel(),
+    viewModel: MapViewModel,
     onNavigate: (LatLng) -> Unit
 ) {
     val markerList by viewModel.markers.collectAsState()
@@ -37,6 +37,11 @@ fun MapScreen(
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(itb, 15f)
     }
+
+    LaunchedEffect(Unit) {
+        viewModel.loadMarkers()
+    }
+
 
     Column(modifier.fillMaxSize()) {
         GoogleMap(
@@ -58,10 +63,15 @@ fun MapScreen(
 
             markerList.forEach { marker ->
                 val pos = LatLng(marker.latitude, marker.longitude)
-                MarkerInfoWindow(
-                    state = rememberUpdatedMarkerState(position = pos)
-                ) {
-                    MarkerCard(markerData = marker)
+
+                key(marker.id ?: marker.latitude.toString()) {
+                    val markerState = rememberUpdatedMarkerState(pos)
+
+                    MarkerInfoWindow(
+                        state = markerState
+                    ) {
+                        MarkerCard(markerData = marker)
+                    }
                 }
             }
 
