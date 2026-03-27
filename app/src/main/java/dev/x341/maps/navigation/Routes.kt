@@ -5,4 +5,7 @@ sealed class Routes (val route: String) {
     object AddMarkerScreen: Routes("AddMarkerScreen/{lat}/{lng}") {
         fun createRoute(lat: Double, lng: Double) = "AddMarkerScreen/$lat/$lng"
     }
+        object EditMarkerScreen: Routes("EditMarkerScreen/{markerId}") {
+            fun createRoute(markerId: String) = "EditMarkerScreen/$markerId"
+        }
 }
