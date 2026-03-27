@@ -99,6 +99,24 @@ class MapViewModel : ViewModel() {
         }
     }
 
+    fun deleteMarker(markerId: String) {
+        viewModelScope.launch {
+            _uploadState.value = UploadState.Loading
+
+            val currentMarker = _markers.value.find { it.id == markerId }
+            val imageUrl = currentMarker?.image_url
+
+            val success = repository.deleteMarker(markerId, imageUrl)
+
+            if (success) {
+                _uploadState.value = UploadState.Success
+                loadMarkers()
+            } else {
+                _uploadState.value = UploadState.Error("Error deleting marker")
+            }
+        }
+    }
+
     fun getItbMarker(): UserMarker {
         return UserMarker(
             id = "itb",
