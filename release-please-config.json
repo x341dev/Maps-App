@@ -1,0 +1,11 @@
+{
+  "packages": {
+    ".": {
+      "release-type": "simple",
+      "package-name": "dev.x341.maps",
+      "changelog-path": "CHANGELOG.md",
+      "version-file": "version.txt"
+    }
+  }
+}
+
