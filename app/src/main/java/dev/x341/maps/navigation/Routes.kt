@@ -1,12 +1,14 @@
 package dev.x341.maps.navigation
 
-sealed class Routes (val route: String) {
-    object MapScreen: Routes("MapScreen")
-    object ListScreen: Routes("ListScreen")
-    object AddMarkerScreen: Routes("AddMarkerScreen/{lat}/{lng}") {
+sealed class Routes(val route: String) {
+    data object MapScreen : Routes("MapScreen")
+    data object ListScreen : Routes("ListScreen")
+
+    data object AddMarkerScreen : Routes("AddMarkerScreen/{lat}/{lng}") {
         fun createRoute(lat: Double, lng: Double) = "AddMarkerScreen/$lat/$lng"
     }
-        object EditMarkerScreen: Routes("EditMarkerScreen/{markerId}") {
-            fun createRoute(markerId: String) = "EditMarkerScreen/$markerId"
-        }
+
+    data object EditMarkerScreen : Routes("EditMarkerScreen/{markerId}") {
+        fun createRoute(markerId: String) = "EditMarkerScreen/$markerId"
+    }
 }
