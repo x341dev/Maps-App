@@ -3,7 +3,6 @@ package dev.x341.maps.screen
 import android.graphics.Bitmap
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -24,7 +23,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -54,6 +52,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import dev.x341.maps.MapViewModel
 import dev.x341.maps.UploadState
+import dev.x341.maps.permission.rememberCameraPermissionAction
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,6 +79,21 @@ fun EditMarkerScreen(
     ) { bitmap: Bitmap? ->
         capturedBitmap = bitmap
     }
+
+    val launchCameraWithPermission = rememberCameraPermissionAction(
+        onPermissionGranted = {
+            runCatching { cameraLauncher.launch(null) }
+                .onFailure {
+                    Toast.makeText(context, "No s'ha pogut obrir la camera", Toast.LENGTH_SHORT).show()
+                }
+        },
+        onPermissionDenied = {
+            Toast.makeText(context, "Cal permisos de camera per fer una foto", Toast.LENGTH_SHORT).show()
+        },
+        onPermissionRationale = {
+            Toast.makeText(context, "Cal permisos de camera per fer una foto", Toast.LENGTH_SHORT).show()
+        }
+    )
 
     LaunchedEffect(Unit) {
         viewModel.resetUploadState()
@@ -195,7 +209,7 @@ fun EditMarkerScreen(
                 // Botón de foto solo visible si es modificable
                 if (isModifiable) {
                     Button(
-                        onClick = { cameraLauncher.launch(null) },
+                        onClick = launchCameraWithPermission,
                         modifier = Modifier.fillMaxWidth(),
                         enabled = uploadState !is UploadState.Loading
                     ) {

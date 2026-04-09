@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,10 +20,10 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.maps.model.LatLng
 import dev.x341.maps.MapViewModel
 import dev.x341.maps.UploadState
+import dev.x341.maps.permission.rememberCameraPermissionAction
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,6 +45,21 @@ fun AddMarkerScreen(
     ) { bitmap: Bitmap? ->
         capturedBitmap = bitmap
     }
+
+    val launchCameraWithPermission = rememberCameraPermissionAction(
+        onPermissionGranted = {
+            runCatching { cameraLauncher.launch(null) }
+                .onFailure {
+                    Toast.makeText(context, "No s'ha pogut obrir la camera", Toast.LENGTH_SHORT).show()
+                }
+        },
+        onPermissionDenied = {
+            Toast.makeText(context, "Cal permisos de camera per fer una foto", Toast.LENGTH_SHORT).show()
+        },
+        onPermissionRationale = {
+            Toast.makeText(context, "Cal permisos de camera per fer una foto", Toast.LENGTH_SHORT).show()
+        }
+    )
 
     LaunchedEffect(Unit) {
         viewModel.resetUploadState()
@@ -122,7 +136,7 @@ fun AddMarkerScreen(
                 }
 
                 Button(
-                    onClick = { cameraLauncher.launch(null) },
+                    onClick = launchCameraWithPermission,
                     modifier = Modifier.fillMaxWidth(),
                     enabled = uploadState !is UploadState.Loading
                 ) {
