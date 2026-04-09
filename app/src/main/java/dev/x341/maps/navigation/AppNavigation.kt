@@ -21,6 +21,7 @@ import androidx.navigation.navArgument
 import com.google.android.gms.maps.model.LatLng
 import dev.x341.maps.MapViewModel
 import dev.x341.maps.database.SupabaseClient
+import dev.x341.maps.layout.MainScaffold
 import dev.x341.maps.screen.AddMarkerScreen
 import dev.x341.maps.screen.EditMarkerScreen
 import dev.x341.maps.screen.ListScreen
@@ -56,61 +57,67 @@ fun AppNavigation() {
         return
     }
 
-    NavHost(
-        navController = navController,
-        startDestination = Routes.MapScreen.route
-    ) {
-        composable(route = Routes.MapScreen.route) {
-            MapScreen(
-                viewModel = sharedViewModel,
-                onNavigateToAdd = { latLng ->
-                    val route = Routes.AddMarkerScreen.createRoute(latLng.latitude, latLng.longitude)
-                    navController.navigate(route)
-                },
-                onNavigateToEdit = { markerId ->
-                    val route = Routes.EditMarkerScreen.createRoute(markerId)
-                    navController.navigate(route)
-                }
-            )
-        }
+    MainScaffold(navController) {
+        NavHost(
+            navController = navController,
+            startDestination = Routes.MapScreen.route
+        ) {
+            composable(route = Routes.MapScreen.route) {
+                MapScreen(
+                    viewModel = sharedViewModel,
+                    onNavigateToAdd = { latLng ->
+                        val route = Routes.AddMarkerScreen.createRoute(latLng.latitude, latLng.longitude)
+                        navController.navigate(route)
+                    },
+                    onNavigateToEdit = { markerId ->
+                        val route = Routes.EditMarkerScreen.createRoute(markerId)
+                        navController.navigate(route)
+                    }
+                )
+            }
 
-        composable(route = Routes.ListScreen.route) {
-            ListScreen(
-                viewModel = sharedViewModel
-            )
-        }
+            composable(route = Routes.ListScreen.route) {
+                ListScreen(
+                    viewModel = sharedViewModel,
+                    onMarkerClick = { markerId ->
+                        val route = Routes.EditMarkerScreen.createRoute(markerId)
+                        navController.navigate(route)
+                    }
+                )
+            }
 
-        composable(
-            route = Routes.AddMarkerScreen.route,
-            arguments = listOf(
-                navArgument("lat") { type = NavType.StringType },
-                navArgument("lng") { type = NavType.StringType }
-            )
-        ) { backStackEntry ->
-            val latStr = backStackEntry.arguments?.getString("lat") ?: "0.0"
-            val lngStr = backStackEntry.arguments?.getString("lng") ?: "0.0"
-            val latLng = LatLng(latStr.toDoubleOrNull() ?: 0.0, lngStr.toDoubleOrNull() ?: 0.0)
+            composable(
+                route = Routes.AddMarkerScreen.route,
+                arguments = listOf(
+                    navArgument("lat") { type = NavType.StringType },
+                    navArgument("lng") { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+                val latStr = backStackEntry.arguments?.getString("lat") ?: "0.0"
+                val lngStr = backStackEntry.arguments?.getString("lng") ?: "0.0"
+                val latLng = LatLng(latStr.toDoubleOrNull() ?: 0.0, lngStr.toDoubleOrNull() ?: 0.0)
 
-            AddMarkerScreen(
-                latLng = latLng,
-                viewModel = sharedViewModel,
-                onNavigateBack = { navController.popBackStack() }
-            )
-        }
+                AddMarkerScreen(
+                    latLng = latLng,
+                    viewModel = sharedViewModel,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
 
-        composable(
-            route = Routes.EditMarkerScreen.route,
-            arguments = listOf(
-                navArgument("markerId") { type = NavType.StringType }
-            )
-        ) { backStackEntry ->
-            val markerId = backStackEntry.arguments?.getString("markerId") ?: return@composable
+            composable(
+                route = Routes.EditMarkerScreen.route,
+                arguments = listOf(
+                    navArgument("markerId") { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+                val markerId = backStackEntry.arguments?.getString("markerId") ?: return@composable
 
-            EditMarkerScreen(
-                markerId = markerId,
-                viewModel = sharedViewModel,
-                onNavigateBack = { navController.popBackStack() }
-            )
+                EditMarkerScreen(
+                    markerId = markerId,
+                    viewModel = sharedViewModel,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
         }
     }
 }

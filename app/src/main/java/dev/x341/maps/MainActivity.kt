@@ -18,9 +18,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MapsTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) {
-                    AppNavigation()
-                }
+                AppNavigation()
             }
         }
     }
