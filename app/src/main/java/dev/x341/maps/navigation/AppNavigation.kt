@@ -23,6 +23,7 @@ import dev.x341.maps.MapViewModel
 import dev.x341.maps.database.SupabaseClient
 import dev.x341.maps.screen.AddMarkerScreen
 import dev.x341.maps.screen.EditMarkerScreen
+import dev.x341.maps.screen.ListScreen
 import dev.x341.maps.screen.MapScreen
 import io.github.jan.supabase.auth.auth
 
@@ -70,6 +71,12 @@ fun AppNavigation() {
                     val route = Routes.EditMarkerScreen.createRoute(markerId)
                     navController.navigate(route)
                 }
+            )
+        }
+
+        composable(route = Routes.ListScreen.route) {
+            ListScreen(
+                viewModel = sharedViewModel
             )
         }
 
